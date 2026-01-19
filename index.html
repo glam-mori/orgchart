@@ -8,8 +8,8 @@
     <style>
         body {
             font-family: 'Cormorant Garamond', serif;
-            background-color: #1a2238; /* 深いネイビーの背景 */
-            color: #d4af37; /* ゴールドのテキスト色 */
+            background-color: #1a2238;
+            color: #d4af37;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -45,7 +45,7 @@
             background-color: #1a2238;
             color: #fff;
             border-radius: 4px;
-            box-sizing: border-box; 
+            box-sizing: border-box;
         }
         button {
             width: 100%;
@@ -57,26 +57,75 @@
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
+            margin-top: 10px;
             transition: background 0.3s;
         }
         button:hover {
             background: linear-gradient(to bottom, #f0d88b, #e6c766);
         }
+        
+        /* 印刷ボタン用のスタイル（少し色を変える） */
+        #print-btn {
+            background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+            color: #1a2238;
+        }
+
         #preview-container {
             margin-top: 30px;
             text-align: center;
             display: none; 
+            width: 100%;
+            max-width: 600px; /* プレビュー画面での表示幅制限 */
         }
-        canvas {
-            max-width: 100%;
+
+        /* 実際に表示する画像（Canvasは隠して、このimgを表示する） */
+        #final-image {
+            width: 100%;
             height: auto;
             border: 3px solid #d4af37;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: block;
+            margin-bottom: 15px;
         }
-        #download-btn {
-            margin-top: 15px;
-            background: linear-gradient(to bottom, #fff, #e0e0e0);
-            color: #1a2238;
+
+        /* Canvasは生成用なので画面には表示しない */
+        canvas {
+            display: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* --- 印刷用スタイル（印刷時のみ適用） --- */
+        @media print {
+            body {
+                background-color: white; /* インク節約のため背景白 */
+                padding: 0;
+                margin: 0;
+                display: block;
+            }
+            .container, h1, .button-group, label, input, button {
+                display: none !important; /* 入力欄やボタンを消す */
+            }
+            #preview-container {
+                display: block !important;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                max-width: none;
+                border: none;
+            }
+            #final-image {
+                border: none;
+                box-shadow: none;
+                width: 13cm; /* 指定の13cm */
+                height: 13cm;
+                max-width: 100%;
+                margin: 0 auto; /* 中央寄せ */
+            }
         }
     </style>
 </head>
@@ -106,11 +155,21 @@
 
     <div id="preview-container">
         <h2>Preview</h2>
+        <p style="font-size:0.9em; color:#ccc; margin-bottom:10px;">
+            ※画像が表示されない場合は再作成ボタンを押してください。<br>
+            ※スマホの方は画像を長押しして保存できます。
+        </p>
+
         <canvas id="certificateCanvas" width="1535" height="1535"></canvas>
-        <br>
-        <a id="download-link" download="GLAM_MEMBER.png">
-            <button id="download-btn">画像をダウンロード (印刷用高画質)</button>
-        </a>
+        
+        <img id="final-image" src="" alt="Certificate">
+
+        <div class="button-group">
+            <a id="download-link" download="GLAM_MEMBER.png">
+                <button>画像をダウンロード</button>
+            </a>
+            <button id="print-btn" onclick="window.print()">このまま印刷する</button>
+        </div>
     </div>
 
     <script>
@@ -119,8 +178,8 @@
         const canvas = document.getElementById('certificateCanvas');
         const ctx = canvas.getContext('2d');
         const previewContainer = document.getElementById('preview-container');
+        const finalImage = document.getElementById('final-image');
         const downloadLink = document.getElementById('download-link');
-
         const fontLoadPromise = document.fonts.ready;
 
         photoInput.addEventListener('change', function(e) {
@@ -130,7 +189,7 @@
                 reader.onload = function(event) {
                     uploadedImage = new Image();
                     uploadedImage.onload = function() {
-                        console.log("Image loaded successfully");
+                        console.log("Image loaded");
                     };
                     uploadedImage.src = event.target.result;
                 };
@@ -152,38 +211,33 @@
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 2. 外枠装飾（太くして高級感を）
+            // 2. 外枠
             ctx.strokeStyle = '#d4af37';
             ctx.lineWidth = 20;
             ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
             ctx.lineWidth = 4;
             ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
 
-            // 3. タイトル描画 (Playfair Displayに変更)
+            // 3. タイトル
             ctx.fillStyle = '#d4af37';
             ctx.textAlign = 'center';
-            // フォントサイズを大きく 100px -> 120px
             ctx.font = 'bold 120px "Playfair Display", serif'; 
             ctx.fillText('GLAM GROUP MEMBER', canvas.width / 2, 180);
 
-            // 4. 写真描画エリア
-            // テキストエリアを確保するため、写真は少し上に、サイズはバランス調整
+            // 4. 写真描画
             const photoSize = 750; 
             const photoY = 250; 
             const photoX = (canvas.width - photoSize) / 2;
 
-            // 写真の枠
             ctx.strokeStyle = '#d4af37';
             ctx.lineWidth = 8;
             ctx.strokeRect(photoX - 8, photoY - 8, photoSize + 16, photoSize + 16);
 
-            // 写真の描画
             if (uploadedImage) {
                 ctx.save();
                 ctx.beginPath();
                 ctx.rect(photoX, photoY, photoSize, photoSize);
                 ctx.clip();
-
                 const scale = Math.max(photoSize / uploadedImage.width, photoSize / uploadedImage.height);
                 const x = photoX + (photoSize - uploadedImage.width * scale) / 2;
                 const y = photoY + (photoSize - uploadedImage.height * scale) / 2;
@@ -198,23 +252,21 @@
                 ctx.fillText('NO PHOTO', canvas.width / 2, photoY + photoSize / 2);
             }
 
-            // 5. テキスト情報描画 (印刷用に大きく)
-            const textStartY = photoY + photoSize + 120; // 写真の下に余白をとる
-            const lineHeight = 110; // 行間を広げる
-            
-            const labelX = 180; // 左端のマージン
-            const valueX = canvas.width - 180; // 右端のマージン
+            // 5. テキスト情報
+            const textStartY = photoY + photoSize + 120;
+            const lineHeight = 110;
+            const labelX = 180;
+            const valueX = canvas.width - 180;
 
             ctx.fillStyle = '#d4af37'; 
 
             // NAME
             ctx.textAlign = 'left';
-            ctx.font = 'bold 55px "Cormorant Garamond", serif'; // ラベルサイズUP
+            ctx.font = 'bold 55px "Cormorant Garamond", serif';
             ctx.fillText('NAME :', labelX, textStartY);
-
             ctx.textAlign = 'right';
             ctx.fillStyle = '#ffffff'; 
-            ctx.font = 'bold 85px "Cormorant Garamond", serif'; // 名前サイズ大幅UP
+            ctx.font = 'bold 85px "Cormorant Garamond", serif';
             ctx.fillText(name, valueX, textStartY);
 
             // DEPARTMENT
@@ -222,10 +274,9 @@
             ctx.textAlign = 'left';
             ctx.font = 'bold 55px "Cormorant Garamond", serif';
             ctx.fillText('DEPARTMENT :', labelX, textStartY + lineHeight);
-
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'right';
-            ctx.font = 'bold 85px "Cormorant Garamond", serif'; // 値サイズUP
+            ctx.font = 'bold 85px "Cormorant Garamond", serif';
             ctx.fillText(dept, valueX, textStartY + lineHeight);
 
             // POSITION
@@ -233,23 +284,22 @@
             ctx.textAlign = 'left';
             ctx.font = 'bold 55px "Cormorant Garamond", serif';
             ctx.fillText('POSITION :', labelX, textStartY + lineHeight * 2);
-
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'right';
-            ctx.font = 'bold 85px "Cormorant Garamond", serif'; // 値サイズUP
+            ctx.font = 'bold 85px "Cormorant Garamond", serif';
             ctx.fillText(pos, valueX, textStartY + lineHeight * 2);
 
-            // 6. 日付（フッター）
-            const today = new Date();
-            const dateString = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            ctx.fillStyle = '#d4af37';
-            ctx.textAlign = 'center';
-            ctx.font = '35px "Cormorant Garamond", serif';
-            ctx.fillText(`Presented on ${dateString}`, canvas.width / 2, canvas.height - 40);
+            
+            // --- 画像変換処理 (ここが重要) ---
+            // Canvasの内容をデータURLに変換してimgタグに入れる
+            const dataUrl = canvas.toDataURL('image/png');
+            finalImage.src = dataUrl;
+            
+            // ダウンロードリンクの設定
+            downloadLink.href = dataUrl;
 
             // プレビュー表示
             previewContainer.style.display = 'block';
-            downloadLink.href = canvas.toDataURL('image/png');
             previewContainer.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
