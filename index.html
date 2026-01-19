@@ -1,3 +1,13 @@
+承知いたしました。
+
+出力される画像全体が「正方形」になるように、キャンバスのサイズと、内部のレイアウト（写真や文字の配置バランス）を調整しました。
+
+* **キャンバスサイズ**: `800x1200`（縦長）から **`1000x1000`（正方形）**に変更しました。
+* **レイアウト調整**: 正方形の枠内に収まるよう、タイトル、写真の位置、テキストの開始位置と行間を微調整しました。写真は引き続き大きく配置されています。
+
+以下のコードを `index.html` に上書きしてGitHubへアップロードしてください。
+
+```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -106,7 +116,7 @@
 
     <div id="preview-container">
         <h2>Preview</h2>
-        <canvas id="certificateCanvas" width="800" height="1130"></canvas>
+        <canvas id="certificateCanvas" width="1000" height="1000"></canvas>
         <br>
         <a id="download-link" download="certificate.png">
             <button id="download-btn">画像をダウンロード</button>
@@ -165,20 +175,15 @@
             // 3. タイトル描画
             ctx.fillStyle = '#d4af37';
             ctx.textAlign = 'center';
-            
-            // メインタイトル
-            ctx.font = '60px "Cinzel Decorative", cursive';
-            ctx.fillText('CERTIFICATE', canvas.width / 2, 120);
-            ctx.font = '40px "Cinzel Decorative", cursive';
-            ctx.fillText('OF RECOGNITION', canvas.width / 2, 170);
+            // フォントサイズを調整し、1行に変更。位置も少し上に調整(100)。
+            ctx.font = '65px "Cinzel Decorative", cursive';
+            ctx.fillText('GLAM GROUP MEMBER', canvas.width / 2, 100);
 
-            // サブタイトル（社名など）
-            ctx.font = '30px "Cormorant Garamond", serif';
-            ctx.fillText('COMPANY NAME HERE', canvas.width / 2, 220);
 
             // 4. 写真描画エリア
-            const photoY = 270;
-            const photoSize = 400;
+            // 正方形レイアウトに合わせて位置を調整
+            const photoSize = 600; // 写真サイズはそのまま大きく
+            const photoY = 160; // タイトルの下、少し間を空けて配置
             const photoX = (canvas.width - photoSize) / 2;
 
             // 写真の枠
@@ -204,46 +209,61 @@
                 ctx.fillStyle = '#2a3a5e';
                 ctx.fillRect(photoX, photoY, photoSize, photoSize);
                 ctx.fillStyle = '#d4af37';
+                ctx.textAlign = 'center';
                 ctx.font = '30px "Cormorant Garamond", serif';
                 ctx.fillText('NO PHOTO', canvas.width / 2, photoY + photoSize / 2);
             }
 
-            // 5. テキスト情報描画
-            const textStartY = photoY + photoSize + 100;
-            const lineHeight = 110;
+            // 5. テキスト情報描画 (変更点：正方形に合わせて位置調整)
+            // 写真の下のマージンを狭めて正方形に収める
+            const textStartY = photoY + photoSize + 50;
+            const lineHeight = 65; // 行間も少し狭める
             
-            ctx.textAlign = 'center';
+            const labelX = 150; // ラベルの左端位置
+            const valueX = canvas.width - 150; // 値の右端位置
+
             ctx.fillStyle = '#d4af37'; // ラベル色（ゴールド）
 
             // NAME
-            ctx.font = 'bold 24px "Cormorant Garamond", serif';
-            ctx.fillText('NAME', canvas.width / 2, textStartY);
+            ctx.textAlign = 'left'; // ラベルは左揃え
+            ctx.font = 'bold 28px "Cormorant Garamond", serif';
+            ctx.fillText('NAME :', labelX, textStartY);
+
+            ctx.textAlign = 'right'; // 値は右揃え
             ctx.fillStyle = '#ffffff'; // 値色（白）
-            ctx.font = 'bold 60px "Cormorant Garamond", serif';
-            ctx.fillText(name, canvas.width / 2, textStartY + 50);
+            ctx.font = 'bold 42px "Cormorant Garamond", serif';
+            ctx.fillText(name, valueX, textStartY);
 
             // DEPARTMENT
             ctx.fillStyle = '#d4af37';
-            ctx.font = 'bold 24px "Cormorant Garamond", serif';
-            ctx.fillText('DEPARTMENT', canvas.width / 2, textStartY + lineHeight);
+            ctx.textAlign = 'left';
+            ctx.font = 'bold 28px "Cormorant Garamond", serif';
+            ctx.fillText('DEPARTMENT :', labelX, textStartY + lineHeight);
+
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 40px "Cormorant Garamond", serif';
-            ctx.fillText(dept, canvas.width / 2, textStartY + lineHeight + 45);
+            ctx.textAlign = 'right';
+            ctx.font = 'bold 42px "Cormorant Garamond", serif';
+            ctx.fillText(dept, valueX, textStartY + lineHeight);
 
             // POSITION
             ctx.fillStyle = '#d4af37';
-            ctx.font = 'bold 24px "Cormorant Garamond", serif';
-            ctx.fillText('POSITION', canvas.width / 2, textStartY + lineHeight * 2);
+            ctx.textAlign = 'left';
+            ctx.font = 'bold 28px "Cormorant Garamond", serif';
+            ctx.fillText('POSITION :', labelX, textStartY + lineHeight * 2);
+
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 40px "Cormorant Garamond", serif';
-            ctx.fillText(pos, canvas.width / 2, textStartY + lineHeight * 2 + 45);
+            ctx.textAlign = 'right';
+            ctx.font = 'bold 42px "Cormorant Garamond", serif';
+            ctx.fillText(pos, valueX, textStartY + lineHeight * 2);
 
             // 6. 日付（フッター）
+            // 正方形の底辺ギリギリに配置
             const today = new Date();
             const dateString = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             ctx.fillStyle = '#d4af37';
+            ctx.textAlign = 'center';
             ctx.font = '20px "Cormorant Garamond", serif';
-            ctx.fillText(`Presented on ${dateString}`, canvas.width / 2, canvas.height - 60);
+            ctx.fillText(`Presented on ${dateString}`, canvas.width / 2, canvas.height - 35);
 
 
             // プレビュー表示とダウンロードリンク設定
@@ -255,3 +275,5 @@
     </script>
 </body>
 </html>
+
+```
