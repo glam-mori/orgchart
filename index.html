@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificate Generator</title>
+    <title>写真ジェネレーター</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Cormorant Garamond', serif;
-            background-color: #1a2238;
+            background-color: #000000; /* 背景：完全な黒 */
             color: #d4af37;
             display: flex;
             flex-direction: column;
@@ -19,13 +19,14 @@
             font-family: 'Playfair Display', serif;
             letter-spacing: 1px;
             margin-bottom: 20px;
+            color: #F2C45A; /* 画面表示用ゴールド */
         }
         .container {
-            background-color: #232f4e;
+            background-color: #111111; /* フォーム背景：濃いグレー */
             padding: 30px;
-            border: 2px solid #d4af37;
+            border: 1px solid #F2C45A;
             border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.1);
             width: 100%;
             max-width: 500px;
         }
@@ -37,37 +38,38 @@
             margin-bottom: 5px;
             font-weight: bold;
             letter-spacing: 1px;
+            color: #F2C45A;
         }
         input[type="text"], input[type="file"] {
             width: 100%;
             padding: 10px;
-            border: 1px solid #d4af37;
-            background-color: #1a2238;
+            border: 1px solid #775c18;
+            background-color: #000000;
             color: #fff;
             border-radius: 4px;
-            box-sizing: border-box;
+            box-sizing: border-box; 
         }
         button {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(to bottom, #e6c766, #d4af37);
+            /* ボタンもグラデーションでリッチに */
+            background: linear-gradient(to bottom, #FBF5B7, #BF953F); 
             border: none;
-            color: #1a2238;
+            color: #000000;
             font-size: 1.1em;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
             margin-top: 10px;
-            transition: background 0.3s;
+            transition: opacity 0.3s;
         }
         button:hover {
-            background: linear-gradient(to bottom, #f0d88b, #e6c766);
+            opacity: 0.9;
         }
         
-        /* 印刷ボタン用のスタイル（少し色を変える） */
         #print-btn {
-            background: linear-gradient(to bottom, #ffffff, #e0e0e0);
-            color: #1a2238;
+            background: linear-gradient(to bottom, #ffffff, #cccccc);
+            color: #000000;
         }
 
         #preview-container {
@@ -75,20 +77,18 @@
             text-align: center;
             display: none; 
             width: 100%;
-            max-width: 600px; /* プレビュー画面での表示幅制限 */
+            max-width: 600px; 
         }
 
-        /* 実際に表示する画像（Canvasは隠して、このimgを表示する） */
         #final-image {
             width: 100%;
             height: auto;
-            border: 3px solid #d4af37;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 1px solid #333;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             display: block;
             margin-bottom: 15px;
         }
 
-        /* Canvasは生成用なので画面には表示しない */
         canvas {
             display: none;
         }
@@ -99,16 +99,16 @@
             justify-content: center;
         }
 
-        /* --- 印刷用スタイル（印刷時のみ適用） --- */
+        /* --- 印刷用スタイル --- */
         @media print {
             body {
-                background-color: white; /* インク節約のため背景白 */
+                background-color: white; 
                 padding: 0;
                 margin: 0;
                 display: block;
             }
-            .container, h1, .button-group, label, input, button {
-                display: none !important; /* 入力欄やボタンを消す */
+            .container, h1, .button-group, label, input, button, p {
+                display: none !important; 
             }
             #preview-container {
                 display: block !important;
@@ -121,17 +121,17 @@
             #final-image {
                 border: none;
                 box-shadow: none;
-                width: 13cm; /* 指定の13cm */
+                width: 13cm; 
                 height: 13cm;
                 max-width: 100%;
-                margin: 0 auto; /* 中央寄せ */
+                margin: 0 auto; 
             }
         }
     </style>
 </head>
 <body>
 
-    <h1>Certificate Generator</h1>
+    <h1>写真ジェネレーター</h1>
 
     <div class="container">
         <div class="input-group">
@@ -150,13 +150,12 @@
             <label for="pos-input">POSITION (役職):</label>
             <input type="text" id="pos-input" placeholder="例: Manager">
         </div>
-        <button onclick="generateCertificate()">認定証を作成</button>
+        <button onclick="generateCertificate()">写真を作成</button>
     </div>
 
     <div id="preview-container">
         <h2>Preview</h2>
-        <p style="font-size:0.9em; color:#ccc; margin-bottom:10px;">
-            ※画像が表示されない場合は再作成ボタンを押してください。<br>
+        <p style="font-size:0.9em; color:#999; margin-bottom:10px;">
             ※スマホの方は画像を長押しして保存できます。
         </p>
 
@@ -197,6 +196,27 @@
             }
         });
 
+        // 金色のグラデーションを作成する関数
+        function getGoldGradient(ctx, y, height) {
+            const grad = ctx.createLinearGradient(0, y, 0, y + height);
+            // 濃い金 -> 明るい金 -> 濃い金 という金属光沢パターン
+            grad.addColorStop(0, '#BF953F');
+            grad.addColorStop(0.3, '#FCF6BA'); // ハイライト
+            grad.addColorStop(0.5, '#B38728');
+            grad.addColorStop(0.8, '#FBF5B7'); // ハイライト
+            grad.addColorStop(1, '#AA771C');
+            return grad;
+        }
+
+        // テキスト用の明るめの金グラデーション
+        function getTextGoldGradient(ctx, x_start, x_end) {
+            const grad = ctx.createLinearGradient(x_start, 0, x_end, 0);
+            grad.addColorStop(0, '#F2C45A');
+            grad.addColorStop(0.5, '#FFFFC2'); // 中央を明るく
+            grad.addColorStop(1, '#F2C45A');
+            return grad;
+        }
+
         async function generateCertificate() {
             await fontLoadPromise;
 
@@ -204,32 +224,36 @@
             const dept = document.getElementById('dept-input').value || ' ';
             const pos = document.getElementById('pos-input').value || ' ';
 
-            // 1. 背景描画
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#1a2238');
-            grad.addColorStop(1, '#232f4e');
-            ctx.fillStyle = grad;
+            // 1. 背景描画 (完全な黒)
+            ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 2. 外枠
-            ctx.strokeStyle = '#d4af37';
+            // 2. 外枠装飾（金属グラデーション適用）
+            // グラデーションの定義
+            const frameGrad = getGoldGradient(ctx, 0, canvas.height);
+            
+            ctx.strokeStyle = frameGrad;
             ctx.lineWidth = 20;
             ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+            
             ctx.lineWidth = 4;
             ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
 
-            // 3. タイトル
-            ctx.fillStyle = '#d4af37';
+            // 3. タイトル描画
             ctx.textAlign = 'center';
             ctx.font = 'bold 120px "Playfair Display", serif'; 
+            
+            // タイトルにグラデーション適用
+            ctx.fillStyle = getTextGoldGradient(ctx, 0, canvas.width);
             ctx.fillText('GLAM GROUP MEMBER', canvas.width / 2, 180);
 
-            // 4. 写真描画
+            // 4. 写真描画エリア
             const photoSize = 750; 
             const photoY = 250; 
             const photoX = (canvas.width - photoSize) / 2;
 
-            ctx.strokeStyle = '#d4af37';
+            // 写真の枠（グラデーション）
+            ctx.strokeStyle = frameGrad;
             ctx.lineWidth = 8;
             ctx.strokeRect(photoX - 8, photoY - 8, photoSize + 16, photoSize + 16);
 
@@ -244,58 +268,61 @@
                 ctx.drawImage(uploadedImage, x, y, uploadedImage.width * scale, uploadedImage.height * scale);
                 ctx.restore();
             } else {
-                ctx.fillStyle = '#2a3a5e';
+                ctx.fillStyle = '#111';
                 ctx.fillRect(photoX, photoY, photoSize, photoSize);
-                ctx.fillStyle = '#d4af37';
+                ctx.fillStyle = '#F2C45A';
                 ctx.textAlign = 'center';
                 ctx.font = '50px "Cormorant Garamond", serif';
                 ctx.fillText('NO PHOTO', canvas.width / 2, photoY + photoSize / 2);
             }
 
-            // 5. テキスト情報
+            // 5. テキスト情報描画
             const textStartY = photoY + photoSize + 120;
             const lineHeight = 110;
             const labelX = 180;
             const valueX = canvas.width - 180;
 
-            ctx.fillStyle = '#d4af37'; 
+            // ラベルの色（少しオレンジがかった金で視認性確保）
+            ctx.fillStyle = '#E6C268'; 
 
             // NAME
             ctx.textAlign = 'left';
             ctx.font = 'bold 55px "Cormorant Garamond", serif';
             ctx.fillText('NAME :', labelX, textStartY);
+            
+            // 値の色（白）
             ctx.textAlign = 'right';
             ctx.fillStyle = '#ffffff'; 
             ctx.font = 'bold 85px "Cormorant Garamond", serif';
             ctx.fillText(name, valueX, textStartY);
 
             // DEPARTMENT
-            ctx.fillStyle = '#d4af37';
+            ctx.fillStyle = '#E6C268';
             ctx.textAlign = 'left';
             ctx.font = 'bold 55px "Cormorant Garamond", serif';
             ctx.fillText('DEPARTMENT :', labelX, textStartY + lineHeight);
+
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'right';
             ctx.font = 'bold 85px "Cormorant Garamond", serif';
             ctx.fillText(dept, valueX, textStartY + lineHeight);
 
             // POSITION
-            ctx.fillStyle = '#d4af37';
+            ctx.fillStyle = '#E6C268';
             ctx.textAlign = 'left';
             ctx.font = 'bold 55px "Cormorant Garamond", serif';
             ctx.fillText('POSITION :', labelX, textStartY + lineHeight * 2);
+
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'right';
             ctx.font = 'bold 85px "Cormorant Garamond", serif';
             ctx.fillText(pos, valueX, textStartY + lineHeight * 2);
 
-            
-            // --- 画像変換処理 (ここが重要) ---
-            // Canvasの内容をデータURLに変換してimgタグに入れる
+            // 日付削除済み（コード除去）
+
+            // --- 画像変換処理 ---
             const dataUrl = canvas.toDataURL('image/png');
             finalImage.src = dataUrl;
-            
-            // ダウンロードリンクの設定
             downloadLink.href = dataUrl;
 
             // プレビュー表示
