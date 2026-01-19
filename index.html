@@ -210,7 +210,6 @@
             await fontLoadPromise;
 
             const name = document.getElementById('name-input').value || ' ';
-            // 部署・役職変数の取得を削除
 
             // 1. 背景描画
             ctx.fillStyle = '#000000';
@@ -228,11 +227,13 @@
             ctx.textAlign = 'center';
             ctx.font = 'bold 120px "Playfair Display", serif'; 
             ctx.fillStyle = getTextGoldGradient(ctx, 0, canvas.width);
-            ctx.fillText('GLAM GROUP MEMBER', canvas.width / 2, 180);
+            ctx.fillText('GLAM GROUP MEMBER', canvas.width / 2, 170);
 
-            // 4. 写真描画エリア
-            const photoSize = 750; 
-            const photoY = 250; 
+            // 4. 写真描画エリア（大きく調整）
+            // サイズを750px -> 850pxに拡大
+            const photoSize = 850; 
+            // 位置を少し上に調整してスペース確保 (250 -> 230)
+            const photoY = 230; 
             const photoX = (canvas.width - photoSize) / 2;
 
             ctx.strokeStyle = frameGrad;
@@ -254,30 +255,32 @@
                 ctx.fillRect(photoX, photoY, photoSize, photoSize);
                 ctx.fillStyle = '#F2C45A';
                 ctx.textAlign = 'center';
-                ctx.font = '50px "Cormorant Garamond", serif';
+                ctx.font = '60px "Cormorant Garamond", serif';
                 ctx.fillText('NO PHOTO', canvas.width / 2, photoY + photoSize / 2);
             }
 
-            // 5. テキスト情報描画 (氏名のみ)
-            // 写真の下から底辺までの中央付近に配置
-            // 写真下: 1000px, 全体高さ: 1535px, 残り: 535px
-            // 中央位置: 1000 + (535/2) ≈ 1267px
-            const textCenterY = 1270;
+            // 5. テキスト情報描画
+            // 写真を大きくした分、テキスト位置も調整
+            // 写真下端(230+850=1080) ～ 画面下端(1535) の中央付近へ
+            const textCenterY = 1320;
             
-            const labelX = 180;
-            const valueX = canvas.width - 180;
+            // マージン調整
+            const labelX = 150;
+            const valueX = canvas.width - 150;
 
             ctx.fillStyle = '#E6C268'; 
 
-            // NAME Label
+            // NAME Label（サイズアップ）
             ctx.textAlign = 'left';
-            ctx.font = 'bold 60px "Cormorant Garamond", serif'; // 少しサイズアップ
+            // 60px -> 80px に大きく変更
+            ctx.font = 'bold 80px "Cormorant Garamond", serif'; 
             ctx.fillText('NAME :', labelX, textCenterY);
             
-            // NAME Value
+            // NAME Value（サイズ維持）
             ctx.textAlign = 'right';
             ctx.fillStyle = '#ffffff'; 
-            ctx.font = 'bold 100px "Cormorant Garamond", serif'; // 名前をさらに大きく
+            // 100px維持（ちょうど良いとのことなので）
+            ctx.font = 'bold 100px "Cormorant Garamond", serif'; 
             ctx.fillText(name, valueX, textCenterY);
 
             // --- 画像変換処理 ---
