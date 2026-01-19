@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Certificate Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Cormorant Garamond', serif;
@@ -16,8 +16,8 @@
             padding: 20px;
         }
         h1 {
-            font-family: 'Cinzel Decorative', cursive;
-            letter-spacing: 2px;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 1px;
             margin-bottom: 20px;
         }
         .container {
@@ -45,7 +45,7 @@
             background-color: #1a2238;
             color: #fff;
             border-radius: 4px;
-            box-sizing: border-box; /* パディングを含めた幅計算 */
+            box-sizing: border-box; 
         }
         button {
             width: 100%;
@@ -65,7 +65,7 @@
         #preview-container {
             margin-top: 30px;
             text-align: center;
-            display: none; /* 初期状態は非表示 */
+            display: none; 
         }
         canvas {
             max-width: 100%;
@@ -91,25 +91,25 @@
         </div>
         <div class="input-group">
             <label for="name-input">NAME (氏名):</label>
-            <input type="text" id="name-input" placeholder="例: 山田 太郎 / Taro Yamada">
+            <input type="text" id="name-input" placeholder="例: Taro Yamada">
         </div>
         <div class="input-group">
             <label for="dept-input">DEPARTMENT (部署):</label>
-            <input type="text" id="dept-input" placeholder="例: 営業部 / Sales Div.">
+            <input type="text" id="dept-input" placeholder="例: Sales Division">
         </div>
         <div class="input-group">
             <label for="pos-input">POSITION (役職):</label>
-            <input type="text" id="pos-input" placeholder="例: 部長 / Manager">
+            <input type="text" id="pos-input" placeholder="例: Manager">
         </div>
         <button onclick="generateCertificate()">認定証を作成</button>
     </div>
 
     <div id="preview-container">
         <h2>Preview</h2>
-        <canvas id="certificateCanvas" width="1000" height="1000"></canvas>
+        <canvas id="certificateCanvas" width="1535" height="1535"></canvas>
         <br>
-        <a id="download-link" download="certificate.png">
-            <button id="download-btn">画像をダウンロード</button>
+        <a id="download-link" download="GLAM_MEMBER.png">
+            <button id="download-btn">画像をダウンロード (印刷用高画質)</button>
         </a>
     </div>
 
@@ -121,10 +121,8 @@
         const previewContainer = document.getElementById('preview-container');
         const downloadLink = document.getElementById('download-link');
 
-        // フォントの読み込みを待つためのプロミス
         const fontLoadPromise = document.fonts.ready;
 
-        // 画像アップロード時の処理
         photoInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -141,125 +139,117 @@
         });
 
         async function generateCertificate() {
-            // フォントの読み込みを確実に待つ
             await fontLoadPromise;
 
             const name = document.getElementById('name-input').value || ' ';
             const dept = document.getElementById('dept-input').value || ' ';
             const pos = document.getElementById('pos-input').value || ' ';
 
-            // 1. 背景描画（深いネイビー）
+            // 1. 背景描画
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             grad.addColorStop(0, '#1a2238');
             grad.addColorStop(1, '#232f4e');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 2. 外枠装飾（ゴールド）
+            // 2. 外枠装飾（太くして高級感を）
             ctx.strokeStyle = '#d4af37';
-            ctx.lineWidth = 15;
-            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-            ctx.lineWidth = 3;
-            ctx.strokeRect(35, 35, canvas.width - 70, canvas.height - 70);
+            ctx.lineWidth = 20;
+            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+            ctx.lineWidth = 4;
+            ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
 
-            // 3. タイトル描画
+            // 3. タイトル描画 (Playfair Displayに変更)
             ctx.fillStyle = '#d4af37';
             ctx.textAlign = 'center';
-            // フォントサイズを調整し、1行に変更。位置も少し上に調整(100)。
-            ctx.font = '65px "Cinzel Decorative", cursive';
-            ctx.fillText('GLAM GROUP MEMBER', canvas.width / 2, 100);
-
+            // フォントサイズを大きく 100px -> 120px
+            ctx.font = 'bold 120px "Playfair Display", serif'; 
+            ctx.fillText('GLAM GROUP MEMBER', canvas.width / 2, 180);
 
             // 4. 写真描画エリア
-            // 正方形レイアウトに合わせて位置を調整
-            const photoSize = 600; // 写真サイズはそのまま大きく
-            const photoY = 160; // タイトルの下、少し間を空けて配置
+            // テキストエリアを確保するため、写真は少し上に、サイズはバランス調整
+            const photoSize = 750; 
+            const photoY = 250; 
             const photoX = (canvas.width - photoSize) / 2;
 
             // 写真の枠
             ctx.strokeStyle = '#d4af37';
-            ctx.lineWidth = 5;
-            ctx.strokeRect(photoX - 5, photoY - 5, photoSize + 10, photoSize + 10);
+            ctx.lineWidth = 8;
+            ctx.strokeRect(photoX - 8, photoY - 8, photoSize + 16, photoSize + 16);
 
-            // 写真の描画（トリミング処理）
+            // 写真の描画
             if (uploadedImage) {
                 ctx.save();
                 ctx.beginPath();
                 ctx.rect(photoX, photoY, photoSize, photoSize);
                 ctx.clip();
 
-                // アスペクト比を維持して中央に配置
                 const scale = Math.max(photoSize / uploadedImage.width, photoSize / uploadedImage.height);
                 const x = photoX + (photoSize - uploadedImage.width * scale) / 2;
                 const y = photoY + (photoSize - uploadedImage.height * scale) / 2;
                 ctx.drawImage(uploadedImage, x, y, uploadedImage.width * scale, uploadedImage.height * scale);
                 ctx.restore();
             } else {
-                // 写真がない場合のプレースホルダー
                 ctx.fillStyle = '#2a3a5e';
                 ctx.fillRect(photoX, photoY, photoSize, photoSize);
                 ctx.fillStyle = '#d4af37';
                 ctx.textAlign = 'center';
-                ctx.font = '30px "Cormorant Garamond", serif';
+                ctx.font = '50px "Cormorant Garamond", serif';
                 ctx.fillText('NO PHOTO', canvas.width / 2, photoY + photoSize / 2);
             }
 
-            // 5. テキスト情報描画 (変更点：正方形に合わせて位置調整)
-            // 写真の下のマージンを狭めて正方形に収める
-            const textStartY = photoY + photoSize + 50;
-            const lineHeight = 65; // 行間も少し狭める
+            // 5. テキスト情報描画 (印刷用に大きく)
+            const textStartY = photoY + photoSize + 120; // 写真の下に余白をとる
+            const lineHeight = 110; // 行間を広げる
             
-            const labelX = 150; // ラベルの左端位置
-            const valueX = canvas.width - 150; // 値の右端位置
+            const labelX = 180; // 左端のマージン
+            const valueX = canvas.width - 180; // 右端のマージン
 
-            ctx.fillStyle = '#d4af37'; // ラベル色（ゴールド）
+            ctx.fillStyle = '#d4af37'; 
 
             // NAME
-            ctx.textAlign = 'left'; // ラベルは左揃え
-            ctx.font = 'bold 28px "Cormorant Garamond", serif';
+            ctx.textAlign = 'left';
+            ctx.font = 'bold 55px "Cormorant Garamond", serif'; // ラベルサイズUP
             ctx.fillText('NAME :', labelX, textStartY);
 
-            ctx.textAlign = 'right'; // 値は右揃え
-            ctx.fillStyle = '#ffffff'; // 値色（白）
-            ctx.font = 'bold 42px "Cormorant Garamond", serif';
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#ffffff'; 
+            ctx.font = 'bold 85px "Cormorant Garamond", serif'; // 名前サイズ大幅UP
             ctx.fillText(name, valueX, textStartY);
 
             // DEPARTMENT
             ctx.fillStyle = '#d4af37';
             ctx.textAlign = 'left';
-            ctx.font = 'bold 28px "Cormorant Garamond", serif';
+            ctx.font = 'bold 55px "Cormorant Garamond", serif';
             ctx.fillText('DEPARTMENT :', labelX, textStartY + lineHeight);
 
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'right';
-            ctx.font = 'bold 42px "Cormorant Garamond", serif';
+            ctx.font = 'bold 85px "Cormorant Garamond", serif'; // 値サイズUP
             ctx.fillText(dept, valueX, textStartY + lineHeight);
 
             // POSITION
             ctx.fillStyle = '#d4af37';
             ctx.textAlign = 'left';
-            ctx.font = 'bold 28px "Cormorant Garamond", serif';
+            ctx.font = 'bold 55px "Cormorant Garamond", serif';
             ctx.fillText('POSITION :', labelX, textStartY + lineHeight * 2);
 
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'right';
-            ctx.font = 'bold 42px "Cormorant Garamond", serif';
+            ctx.font = 'bold 85px "Cormorant Garamond", serif'; // 値サイズUP
             ctx.fillText(pos, valueX, textStartY + lineHeight * 2);
 
             // 6. 日付（フッター）
-            // 正方形の底辺ギリギリに配置
             const today = new Date();
             const dateString = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             ctx.fillStyle = '#d4af37';
             ctx.textAlign = 'center';
-            ctx.font = '20px "Cormorant Garamond", serif';
-            ctx.fillText(`Presented on ${dateString}`, canvas.width / 2, canvas.height - 35);
+            ctx.font = '35px "Cormorant Garamond", serif';
+            ctx.fillText(`Presented on ${dateString}`, canvas.width / 2, canvas.height - 40);
 
-
-            // プレビュー表示とダウンロードリンク設定
+            // プレビュー表示
             previewContainer.style.display = 'block';
             downloadLink.href = canvas.toDataURL('image/png');
-            // 生成後にスクロール
             previewContainer.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
