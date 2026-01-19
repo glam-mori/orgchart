@@ -186,7 +186,6 @@
             }
         });
 
-        // 金色のグラデーション（枠線用）
         function getGoldGradient(ctx, y, height) {
             const grad = ctx.createLinearGradient(0, y, 0, y + height);
             grad.addColorStop(0, '#BF953F');
@@ -197,7 +196,6 @@
             return grad;
         }
 
-        // 金色のグラデーション（文字用）
         function getTextGoldGradient(ctx, x_start, x_end) {
             const grad = ctx.createLinearGradient(x_start, 0, x_end, 0);
             grad.addColorStop(0, '#F2C45A');
@@ -229,10 +227,8 @@
             ctx.fillStyle = getTextGoldGradient(ctx, 0, canvas.width);
             ctx.fillText('GLAM GROUP MEMBER', canvas.width / 2, 170);
 
-            // 4. 写真描画エリア（大きく調整）
-            // サイズを750px -> 850pxに拡大
+            // 4. 写真描画エリア
             const photoSize = 850; 
-            // 位置を少し上に調整してスペース確保 (250 -> 230)
             const photoY = 230; 
             const photoX = (canvas.width - photoSize) / 2;
 
@@ -259,29 +255,24 @@
                 ctx.fillText('NO PHOTO', canvas.width / 2, photoY + photoSize / 2);
             }
 
-            // 5. テキスト情報描画
-            // 写真を大きくした分、テキスト位置も調整
-            // 写真下端(230+850=1080) ～ 画面下端(1535) の中央付近へ
-            const textCenterY = 1320;
+            // 5. テキスト情報描画 (中央揃え・サイズ統一)
+            // 写真下エリアを使って、上段に「NAME」、下段に「名前」を配置
             
-            // マージン調整
-            const labelX = 150;
-            const valueX = canvas.width - 150;
+            // レイアウト計算
+            const labelY = 1250; // ラベルの高さ
+            const nameY = 1400;  // 名前の高さ
 
+            ctx.textAlign = 'center'; // 中央揃え
+
+            // NAME Label
             ctx.fillStyle = '#E6C268'; 
-
-            // NAME Label（サイズアップ）
-            ctx.textAlign = 'left';
-            // 60px -> 80px に大きく変更
-            ctx.font = 'bold 80px "Cormorant Garamond", serif'; 
-            ctx.fillText('NAME :', labelX, textCenterY);
-            
-            // NAME Value（サイズ維持）
-            ctx.textAlign = 'right';
-            ctx.fillStyle = '#ffffff'; 
-            // 100px維持（ちょうど良いとのことなので）
             ctx.font = 'bold 100px "Cormorant Garamond", serif'; 
-            ctx.fillText(name, valueX, textCenterY);
+            ctx.fillText('NAME', canvas.width / 2, labelY);
+            
+            // NAME Value
+            ctx.fillStyle = '#ffffff'; 
+            ctx.font = 'bold 100px "Cormorant Garamond", serif'; 
+            ctx.fillText(name, canvas.width / 2, nameY);
 
             // --- 画像変換処理 ---
             const dataUrl = canvas.toDataURL('image/png');
